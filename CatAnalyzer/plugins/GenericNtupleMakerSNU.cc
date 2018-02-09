@@ -1237,7 +1237,7 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
 
     electrons_electronID_heep.push_back(el.electronID("heepElectronID-HEEPV70"));
 
-    electrons_missinghits.push_back(el.MissingHits());
+    //electrons_missinghits.push_back(el.MissingHits());
     electrons_mcMatched.push_back(el.mcMatched());
     electrons_isPF.push_back(el.isPF());
     electrons_passConversionVeto.push_back(el.passConversionVeto());
@@ -1271,8 +1271,8 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
     electrons_dxy.push_back(el.dxy()); 
     electrons_sigdxy.push_back(el.ipsignificance());
     electrons_dz.push_back(el.dz());
-    electrons_mva.push_back(el.mva());
-    electrons_zzmva.push_back(el.zzmva());
+    //electrons_mva.push_back(el.mva());
+    //electrons_zzmva.push_back(el.zzmva());
     electrons_smearedScale.push_back(el.smearedScale());
     electrons_isGsfCtfScPixChargeConsistent.push_back(el.isGsfCtfScPixChargeConsistent());
     
@@ -1373,12 +1373,12 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
     jets_smearedResUp.push_back(jt.smearedResUp()); 
     jets_PileupJetId.push_back(jt.pileupJetId()); 
 
-    jets_L2L3resJEC.push_back(jt.L2L3resJEC());
-    jets_L3absJEC.push_back(jt.L3absJEC());
-    jets_L2relJEC.push_back(jt.L2relJEC());
-    jets_L1fastjetJEC.push_back(jt.L1fastjetJEC());
+    //jets_L2L3resJEC.push_back(jt.L2L3resJEC());
+    //jets_L3absJEC.push_back(jt.L3absJEC());
+    //jets_L2relJEC.push_back(jt.L2relJEC());
+    //jets_L1fastjetJEC.push_back(jt.L1fastjetJEC());
     jets_Rho.push_back(jt.Rho());
-    jets_JetArea.push_back(jt.JetArea());
+    jets_JetArea.push_back(jt.JetArea()); //BHO
     jets_rawpt.push_back(jt.RawPt());
     jets_rawenergy.push_back(jt.RawE());
   }
@@ -1432,12 +1432,12 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
     fatjets_puppi_tau1.push_back(jt.puppi_tau1());
     fatjets_puppi_tau2.push_back(jt.puppi_tau2());
     fatjets_puppi_tau3.push_back(jt.puppi_tau3());
-    fatjets_L2L3resJEC.push_back(jt.L2L3resJEC());
-    fatjets_L3absJEC.push_back(jt.L3absJEC());
-    fatjets_L2relJEC.push_back(jt.L2relJEC());
-    fatjets_L1fastjetJEC.push_back(jt.L1fastjetJEC());
+    //fatjets_L2L3resJEC.push_back(jt.L2L3resJEC());
+    //fatjets_L3absJEC.push_back(jt.L3absJEC());
+    //fatjets_L2relJEC.push_back(jt.L2relJEC());
+    //fatjets_L1fastjetJEC.push_back(jt.L1fastjetJEC());
     fatjets_Rho.push_back(jt.Rho());
-    fatjets_JetArea.push_back(jt.JetArea());
+    fatjets_JetArea.push_back(jt.JetArea()); //BHO
 
   }
 

@@ -55,7 +55,7 @@ namespace cat {
   const double WP_BTAG_DeepCSVM = 0.6324;
   const double WP_BTAG_DeepCSVT = 0.8958;
 
-  class Jet : public Particle{
+  class Jet : public Particle {
   public:
     Jet();
     Jet(const reco::LeafCandidate & aJet);
@@ -104,7 +104,18 @@ namespace cat {
     float smearedResDown(int era = 0) const { return smearedRes(-1, era); };
 
     float qgLikelihood() const { return qgLikelihood_; }
-    
+ 
+
+    //BHO: copy of jalmond/snu_nm_v8-0-6
+    float RawPt() const {return rawpt_;}
+    float RawE() const {return rawe_;}
+    float L2L3resJEC() const { return l2l3res_;}
+    float L3absJEC() const { return l3fabs_;}
+    float L1fastjetJEC() const { return l1fast_;}
+    float Rho() const { return rho_;}
+    float JetArea() const { return area_ ;}
+
+   
     void setLooseJetID(bool id) { looseJetID_ = id; }
     void setTightJetID(bool id) { tightJetID_ = id; }
     void setTightLepVetoJetID(bool id) { tightLepVetoJetID_ = id; }
@@ -136,8 +147,18 @@ namespace cat {
 
     void setQGLikelihood(float f) { qgLikelihood_ = f; }
 
-  private:
+    //BHO: copy of jalmond/snu_nm_v8-0-6
+    void setRawPt(float f) {rawpt_= f;}
+    void setRawE(float f) {rawe_= f;}
+    void setL2L3resJEC(float f) {l2l3res_= f;}
+    void setL3absJEC(float f) {l3fabs_ = f;}
+    void setL2relJEC(float f) {l2rel_ = f;}
+    void setL1fastjetJEC(float f) {l1fast_ = f;}
+    void setRho(float f) {rho_ = f;}
+    void setJetArea(float f) {area_ = f;}
 
+
+  private:
     edm::FwdRef<reco::GenJetCollection>  genJetFwdRef_;
 
     bool looseJetID_;
@@ -167,6 +188,10 @@ namespace cat {
     float fJER_, fJERUp_, fJERDown_;
 
     float qgLikelihood_;
+
+    //BHO: copy of jalmond/snu_nm_v8-0-6
+    float rawpt_, rawe_, l2l3res_,l3fabs_, l2rel_, l1fast_;
+    float rho_, area_;
 
   };
 }

@@ -408,15 +408,15 @@ MuonCollection h2muAnalyzer::selectMuons(const MuonCollection& muons, systematic
     u1 = gRandom->Rndm();
     u2 = gRandom->Rndm();
     if (!runOnMC){ 
-        scaleFactor = rocCor -> kScaleDT(mu.charge(), mu.pt(), mu.eta(), mu.phi(), 0, 0);
+        scaleFactor = rocCor -> kScaleDT(mu.charge(), mu.pt(), mu.eta(), mu.phi(), RoccoR::Default, 0);
     }
     else{
         if (mu.pt() == b_genlep1.Pt())
-            scaleFactor = rocCor -> kScaleFromGenMC(mu.charge(), mu.pt(), mu.eta(), mu.phi(), mu.trackerLayersWithMeasurement(), b_genlep1.Pt(), u1, 0, 0);
+            scaleFactor = rocCor -> kScaleFromGenMCDet(mu.charge(), mu.pt(), mu.eta(), mu.phi(), mu.trackerLayersWithMeasurement(), b_genlep1.Pt(), u1, RoccoR::Default, 0);
         if (mu.pt() == b_genlep2.Pt())
-            scaleFactor = rocCor -> kScaleFromGenMC(mu.charge(), mu.pt(), mu.eta(), mu.phi(), mu.trackerLayersWithMeasurement(), b_genlep2.Pt(), u1, 0, 0);
+            scaleFactor = rocCor -> kScaleFromGenMCDet(mu.charge(), mu.pt(), mu.eta(), mu.phi(), mu.trackerLayersWithMeasurement(), b_genlep2.Pt(), u1, RoccoR::Default, 0);
         else {
-            scaleFactor = rocCor -> kScaleAndSmearMC(mu.charge(), mu.pt(), mu.eta(), mu.phi(), mu.trackerLayersWithMeasurement(), u1, u2, 0, 0);
+            scaleFactor = rocCor -> kScaleAndSmearMCDet(mu.charge(), mu.pt(), mu.eta(), mu.phi(), mu.trackerLayersWithMeasurement(), u1, u2, RoccoR::Default, 0);
         }
     } 
     mu.setP4(m.p4() * scaleFactor);

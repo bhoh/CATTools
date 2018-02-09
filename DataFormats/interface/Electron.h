@@ -33,7 +33,12 @@ namespace cat {
       if( dR < 0.35) return relIso03_;
       else return relIso04_;
     }
-    
+   
+    //BHO: copy of jalmond/snu_nm_v8-0-6
+    int MissingHits() const{return nhitsmiss_;}
+    float mva() const {return mva_;}
+    float zzmva() const {return zzmva_;}
+   
     float scEta() const { return scEta_; }
     bool passConversionVeto() const { return passConversionVeto_; }
     bool isGsfCtfScPixChargeConsistent() const{ return isGsfCtfScPixChargeConsistent_; }
@@ -71,6 +76,12 @@ namespace cat {
     void setSmearedScale(const float scale) { smearedScale_ = scale; }
 
     float scaleFactor(const std::string& name, int sign = 0) const;
+
+    //BHO: copy of jalmond/snu_nm_v8-0-6
+    void setNMissingHit(int i) {nhitsmiss_=i;}
+    void setMVA(float f){ mva_=f;}
+    void setZZMVA(float f){ zzmva_=f;}
+
     
   private:
 
@@ -87,6 +98,12 @@ namespace cat {
     
     int snuID_;
     bool isTrigMVAValid_;
+
+    //BHO: copy of jalmond/snu_nm_v8-0-6
+    int nhitsmiss_;
+    float mva_;
+    float zzmva_;
+
   };
 }
 

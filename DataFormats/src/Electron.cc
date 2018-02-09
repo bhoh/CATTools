@@ -17,7 +17,11 @@ Electron::Electron(const reco::LeafCandidate & aElectron) :
   isGsfCtfScPixChargeConsistent_(false),
   isEB_(false),
   snuID_(0),
-  isTrigMVAValid_(false)
+  isTrigMVAValid_(false),
+  //BHO: copy of jalmond/snu_nm_v8-0-6
+  nhitsmiss_(-1),
+  mva_(-999.),
+  zzmva_(-999.)
 {}
 
 /// destructor

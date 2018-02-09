@@ -224,7 +224,7 @@ rochcor2016::~rochcor2016(){
 
 rochcor2016::rochcor2016(){
   
-  std::string cmsswdir = getenv("CMSSW_BASE");
+  string cmsswdir = getenv("CMSSW_BASE");
   
   muresol1.init(cmsswdir+"/src/CATTools/CatAnalyzer/src/RoccoR_13tev.txt");
   //muresol1.dumpParams();
@@ -250,7 +250,7 @@ rochcor2016::rochcor2016(){
 rochcor2016::rochcor2016(int seed){
 
 
-  std::string cmsswdir = getenv("CMSSW_BASE");
+  string cmsswdir = getenv("CMSSW_BASE");
   muresol1.init(cmsswdir+"/src/CATTools/CatAnalyzer/src/RoccoR_13tev.txt");
   //muresol1.dumpParams();
 

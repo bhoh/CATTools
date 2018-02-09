@@ -53,6 +53,7 @@ namespace cat {
     float getEffArea( float dR, float scEta );
     int getSNUID(float, float, float, float, float, float, int, bool, float);
     edm::EDGetTokenT<edm::View<pat::Electron> > src_;
+    edm::EDGetToken electronsMiniAODToken_;
     edm::EDGetTokenT<edm::View<pat::Electron> > unsmearedElecToken_;
     edm::EDGetTokenT<reco::VertexCollection> vertexLabel_;
     edm::EDGetTokenT<reco::GenParticleCollection> mcLabel_;
@@ -60,6 +61,8 @@ namespace cat {
     edm::EDGetTokenT<reco::BeamSpot> beamLineSrc_;
     edm::EDGetTokenT<double> rhoLabel_;
 
+    edm::EDGetTokenT<edm::ValueMap<float> > mvaValuesMapToken_;
+    edm::EDGetTokenT<edm::ValueMap<float> > zzmvaValuesMapToken_;
     bool runOnMC_;
 
     typedef std::pair<std::string, edm::InputTag> NameTag;
@@ -68,6 +71,12 @@ namespace cat {
     std::vector<NameTag> elecIDSrcs_;
     std::vector<edm::EDGetTokenT<edm::ValueMap<bool> > > elecIDTokens_;
     const std::vector<std::string> electronIDs_;
+
+    //BHO: copy of jalmond/snu_nm_v8-0-6
+    std::vector<Float_t> mvaValue_;
+    std::vector<Float_t> zzmvaValue_;
+
+
 
   };
 
@@ -118,6 +127,7 @@ double cat::CATElectronProducer::getMiniRelIso(edm::Handle<pat::PackedCandidateC
   return iso/ptcl.pt();
 }
 
+//BHO: copy of jalmond/snu_nm_v8-0-6
 cat::CATElectronProducer::CATElectronProducer(const edm::ParameterSet & iConfig) :
   src_(consumes<edm::View<pat::Electron> >(iConfig.getParameter<edm::InputTag>("src"))),
   unsmearedElecToken_(consumes<edm::View<pat::Electron> >(iConfig.getParameter<edm::InputTag>("unsmaredElectrons"))),
@@ -126,6 +136,8 @@ cat::CATElectronProducer::CATElectronProducer(const edm::ParameterSet & iConfig)
   pfSrc_(consumes<pat::PackedCandidateCollection>(iConfig.getParameter<edm::InputTag>("pfSrc"))),
   beamLineSrc_(consumes<reco::BeamSpot>(iConfig.getParameter<edm::InputTag>("beamLineSrc"))),
   rhoLabel_(consumes<double>(iConfig.getParameter<edm::InputTag>("rhoLabel"))),
+  mvaValuesMapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("mvaValuesMap"))),
+  zzmvaValuesMapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("zzmvaValuesMap"))),
   electronIDs_(iConfig.getParameter<std::vector<std::string> >("electronIDs"))
 {
   produces<cat::ElectronCollection>();
@@ -150,6 +162,15 @@ void cat::CATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetu
 
   edm::Handle<edm::View<pat::Electron> > src;
   iEvent.getByToken(src_, src);
+
+  //BHO: jalmond/snu_nm_v8-0-6
+  edm::Handle<edm::View<reco::GsfElectron> > electrons;
+  iEvent.getByToken(electronsMiniAODToken_,electrons);
+  edm::Handle<edm::ValueMap<float> > mvaValues;
+  iEvent.getByToken(mvaValuesMapToken_,mvaValues);
+  edm::Handle<edm::ValueMap<float> > zzmvaValues;
+  iEvent.getByToken(zzmvaValuesMapToken_,zzmvaValues);
+
 
   edm::Handle<edm::View<pat::Electron> > unsmearedElecHandle;
   iEvent.getByToken(unsmearedElecToken_, unsmearedElecHandle);
@@ -192,6 +213,7 @@ void cat::CATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetu
     cat::Electron aElectron(aPatElectron);
     auto elecsRef = src->refAt(j);
     auto unsmearedElecRef = unsmearedElecHandle->refAt(j);
+    const auto el = electrons->ptrAt(j); //BHO copy of jalmond/snu_nm_v8-0-6
     // nan protection - smearing fails for soft electrons
     if ( std::isnan(std::abs(aElectron.p())) ) aElectron = *unsmearedElecRef;
 
@@ -233,6 +255,10 @@ void cat::CATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetu
 
     aElectron.setscEta(scEta);
     aElectron.setPassConversionVeto( aPatElectron.passConversionVeto() );
+
+    //BHO: copy of jalmond/snu_nm_v8-0-6
+    aElectron.setMVA((*mvaValues)[el]);
+    aElectron.setZZMVA((*zzmvaValues)[el]);
 
     if (elecIDSrcs_.size()){// for remade electron IDs
       for (size_t i = 0; i < elecIDSrcs_.size(); ++i){
@@ -310,6 +336,10 @@ void cat::CATElectronProducer::produce(edm::Event & iEvent, const edm::EventSetu
              dr03TkSumPt < 0.18*pt ) isTrigMVAValid = true;
       }
     }
+
+    //BHO: copy of jalmond/snu_nm_v8-0-6
+    aElectron.setNMissingHit(aPatElectron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS));
+
     aElectron.setTrigMVAValid(isTrigMVAValid);
 
     out->push_back(aElectron);

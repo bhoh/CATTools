@@ -33,11 +33,13 @@ class CATJetProducer : public edm::stream::EDProducer<>
 {
 public:
   explicit CATJetProducer(const edm::ParameterSet & iConfig);
+  virtual ~CATJetProducer() {}
 
   void produce(edm::Event & iEvent, const edm::EventSetup & iSetup) override;
   void beginLuminosityBlock(const edm::LuminosityBlock& lumi, const edm::EventSetup&) override;
 
   std::vector<const reco::Candidate *> getAncestors(const reco::Candidate &c);
+  std::string upperCase(std::string input);
   bool hasBottom(const reco::Candidate &c);
   bool hasCharm(const reco::Candidate &c);
   bool decayFromBHadron(const reco::Candidate &c);
@@ -47,6 +49,7 @@ public:
 
 private:
   edm::EDGetTokenT<pat::JetCollection> src_;
+  const edm::InputTag   inputTag;
   edm::EDGetTokenT<double> rhoToken_;
   edm::EDGetTokenT<edm::ValueMap<float>> qgToken_;
   std::vector<std::string> flavTagNames_;
@@ -59,7 +62,7 @@ private:
   bool runOnMC_;
   //PFJetIDSelectionFunctor pfjetIDFunctor;
   JetCorrectionUncertainty *jecUnc;
-
+  bool ispuppi; //BHO
   CLHEP::HepRandomEngine* rng_;
 };
 
@@ -67,6 +70,7 @@ private:
 
 cat::CATJetProducer::CATJetProducer(const edm::ParameterSet & iConfig) :
   src_(consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("src"))),
+  inputTag (iConfig.getParameter<edm::InputTag>("src")),// to find if puppi //BHO
   rhoToken_(consumes<double>(iConfig.getParameter<edm::InputTag>("rho"))),
   qgToken_(consumes<edm::ValueMap<float>>(iConfig.getParameter<edm::InputTag>("qgLikelihood"))),
   btagNames_(iConfig.getParameter<std::vector<std::string> >("btagNames")),
@@ -81,14 +85,29 @@ cat::CATJetProducer::CATJetProducer(const edm::ParameterSet & iConfig) :
     flavTagTokens_.push_back(consumes<edm::ValueMap<float>>(label));
   }
 
+  if(upperCase(inputTag.label()).find(upperCase("PUPPI")) != std::string::npos)ispuppi=true;
+  else ispuppi=false;
+
   produces<cat::JetCollection>();
 }
+
+
+//BHO
+std::string cat::CATJetProducer::upperCase(std::string input)
+{
+  for (std::string::iterator it = input.begin(); it != input.end(); ++ it)
+    *it = toupper(*it);
+  return input;
+}
+
 
 void cat::CATJetProducer::beginLuminosityBlock(const edm::LuminosityBlock& lumi, const edm::EventSetup&)
 {
   edm::Service<edm::RandomNumberGenerator> rng;
   rng_ = &rng->getEngine(lumi.index());
 }
+
+
 
 void cat::CATJetProducer::produce(edm::Event & iEvent, const edm::EventSetup & iSetup)
 {
@@ -173,7 +192,7 @@ void cat::CATJetProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
     }
 
     // aJet.addBDiscriminatorPair( aPatJet.bDiscriminator(btagNames_.at(0)) );
-
+    
     if ( btagNames_.empty() ) {
       aJet.setBDiscriminators(aPatJet.getPairDiscri());
       // const std::vector<std::pair<std::string, float> > bpair = aPatJet.getPairDiscri();
@@ -199,12 +218,26 @@ void cat::CATJetProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
     if( aPatJet.hasUserFloat("vtxNtracks") ) aJet.setVtxNtracks( aPatJet.userFloat("vtxNtracks") );
     if( aPatJet.hasUserFloat("vtx3DVal") ) aJet.setVtx3DVal( aPatJet.userFloat("vtx3DVal") );
     if( aPatJet.hasUserFloat("vtx3DSig") ) aJet.setVtx3DSig( aPatJet.userFloat("vtx3DSig") );
-
+    
     aJet.setHadronFlavour(aPatJet.hadronFlavour());
     aJet.setPartonFlavour(aPatJet.partonFlavour());
     int partonPdgId = aPatJet.genParton() ? aPatJet.genParton()->pdgId() : 0;
     aJet.setPartonPdgId(partonPdgId);
 
+    //BHO: copy of jalmond/snu_nm_v8-0-6
+    aJet.setRawPt(aPatJet.correctedJet("Uncorrected").pt() );
+    aJet.setRawE(aPatJet.correctedJet("Uncorrected").energy() );
+    
+    aJet.setL3absJEC( aPatJet.correctedJet("L3Absolute").pt()/aPatJet.correctedJet("L2Relative").pt() );
+    if(!ispuppi){
+      aJet.setL2relJEC( aPatJet.correctedJet("L2Relative").pt()/aPatJet.correctedJet("L1FastJet").pt() );
+      aJet.setL1fastjetJEC( aPatJet.correctedJet("L1FastJet").pt()/aPatJet.correctedJet("Uncorrected").pt() );
+      if(iEvent.isRealData())aJet.setL2L3resJEC(aPatJet.correctedJet("L2L3Residual").pt()/aPatJet.correctedJet("L3Absolute").pt());   
+      else aJet.setL2L3resJEC(1.);
+    }
+
+     
+    
     // calculate quark/gluon likelihood but only for AK4
     aJet.setQGLikelihood(-2.0);
     if ( qgHandle.isValid() ) {
@@ -213,7 +246,7 @@ void cat::CATJetProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
       aJet.setQGLikelihood(qgLikelihood);
       //aJet.setQGLikelihood(aPatJet.userFloat("QGTaggerAK4PFCHS:qgLikelihood"));
     }
-
+    
     // setting JEC uncertainty
     if (!payloadName_.empty()){
       jecUnc->setJetEta(aJet.eta());
@@ -266,13 +299,16 @@ void cat::CATJetProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
     }
 
     out->push_back(aJet);
-  }
+  }//end of for
 
   if (jecUnc) delete jecUnc;
 
-  iEvent.put(std::move(out));
+  iEvent.put(std::move(out)); 
 }
+
+//BHO
 
 #include "FWCore/Framework/interface/MakerMacros.h"
 using namespace cat;
 DEFINE_FWK_MODULE(CATJetProducer);
+

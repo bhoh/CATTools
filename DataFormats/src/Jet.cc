@@ -26,7 +26,18 @@ Jet::Jet(const reco::LeafCandidate & aJet) :
   shiftedEnDown_(1),
   shiftedEnUp_(1),					     
   fJER_(1), fJERUp_(1), fJERDown_(1),
-  qgLikelihood_(-2)
+  qgLikelihood_(-2),
+
+  //BHO: copy of jalmond/snu_nm_v8-0-6
+  rawpt_(0.), 
+  rawe_(0.), 
+  l2l3res_(0.),
+  l3fabs_(0.),
+  l2rel_(0.),
+  l1fast_(0.),
+  rho_(-999.),
+  area_(-999.)
+  
 {}
 
 /// destructor

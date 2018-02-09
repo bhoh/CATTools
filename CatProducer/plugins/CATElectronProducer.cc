@@ -140,6 +140,11 @@ cat::CATElectronProducer::CATElectronProducer(const edm::ParameterSet & iConfig)
   zzmvaValuesMapToken_(consumes<edm::ValueMap<float> >(iConfig.getParameter<edm::InputTag>("zzmvaValuesMap"))),
   electronIDs_(iConfig.getParameter<std::vector<std::string> >("electronIDs"))
 {
+
+  electronsMiniAODToken_    = mayConsume<edm::View<reco::GsfElectron> >
+    (iConfig.getParameter<edm::InputTag>
+     ("electronsMiniAOD"));
+
   produces<cat::ElectronCollection>();
 
   if (iConfig.existsAs<edm::ParameterSet>("electronIDSources")) {

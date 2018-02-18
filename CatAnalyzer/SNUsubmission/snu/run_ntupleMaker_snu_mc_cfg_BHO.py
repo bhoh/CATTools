@@ -78,7 +78,7 @@ process.ntuple = cms.EDAnalyzer("GenericNtupleMakerSNU",
     makeSlim= cms.bool(True),
     allweights= cms.bool(False),
     metFilterBitsPAT = cms.InputTag("TriggerResults","","PAT"),                                                                                                     
-    metFilterBitsRECO = cms.InputTag("TriggerResults","","RECO"),               
+    metFilterBitsMINIAOD = cms.InputTag("TriggerResults","","MINIAOD"), #BHO               
     metFilterNames = cms.vstring(                                               
         "HBHENoiseFilter",
         "HBHENoiseIsoFilter",

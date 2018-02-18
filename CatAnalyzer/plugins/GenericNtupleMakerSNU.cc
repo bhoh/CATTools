@@ -276,7 +276,7 @@ private:
   edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> triggerObjects_;
 
   edm::EDGetTokenT<edm::TriggerResults> metFilterBitsPAT_;
-  edm::EDGetTokenT<edm::TriggerResults> metFilterBitsMINIAOD_;
+  edm::EDGetTokenT<edm::TriggerResults> metFilterBitsRECO_;
 
   edm::EDGetTokenT<cat::TriggerNames> trigNamesToken_;
   edm::EDGetTokenT<cat::TriggerBits> trigBitsToken_;
@@ -507,7 +507,7 @@ GenericNtupleMakerSNU::GenericNtupleMakerSNU(const edm::ParameterSet& pset)
   jetToken_ = consumes<edm::View<cat::Jet> >(pset.getParameter<edm::InputTag>("jets"));
   fatjetToken_ = consumes<edm::View<cat::FatJet> >(pset.getParameter<edm::InputTag>("fatjets"));
   metFilterBitsPAT_ = consumes<edm::TriggerResults>(pset.getParameter<edm::InputTag>("metFilterBitsPAT"));
-  metFilterBitsMINIAOD_ = consumes<edm::TriggerResults>(pset.getParameter<edm::InputTag>("metFilterBitsMINIAOD"));
+  metFilterBitsRECO_ = consumes<edm::TriggerResults>(pset.getParameter<edm::InputTag>("metFilterBitsRECO"));
   vtxToken_  = consumes<reco::VertexCollection >(pset.getParameter<edm::InputTag>("vertices"));
   /// new weights
   genWeightToken_       = consumes<cat::GenWeights>              (pset.getParameter<edm::InputTag>("genWeightLabel"));
@@ -1526,7 +1526,7 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
 
   edm::Handle<edm::TriggerResults> metFilterBits;
   if (!event.getByToken(metFilterBitsPAT_, metFilterBits)){
-    event.getByToken(metFilterBitsMINIAOD_, metFilterBits);
+    event.getByToken(metFilterBitsRECO_, metFilterBits);
   }
 
   const edm::TriggerNames &metFilterNames = event.triggerNames(*metFilterBits);

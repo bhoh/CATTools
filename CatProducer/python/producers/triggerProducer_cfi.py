@@ -20,7 +20,7 @@ catTrigger = cms.EDProducer("CATTriggerProducer",
     ),
     flags = cms.PSet(
         triggerResults = cms.VInputTag(
-            cms.InputTag("TriggerResults","","MINIAOD"), #BHO
+            cms.InputTag("TriggerResults","","RECO"),
             cms.InputTag("TriggerResults","","PAT"),
         ),
         names = cms.vstring(

@@ -1524,6 +1524,7 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
   Flag_globalTightHalo2016Filter=false;
   Flag_EcalDeadCellTriggerPrimitiveFilter=false;
 
+/*
   edm::Handle<edm::TriggerResults> metFilterBits;
   if (!event.getByToken(metFilterBitsPAT_, metFilterBits)){
     event.getByToken(metFilterBitsRECO_, metFilterBits);
@@ -1548,6 +1549,7 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
     }
   }
 
+*/ //comment out by BHO
 
   ///// Fill GENParticle Info
   if(!event.isRealData()){

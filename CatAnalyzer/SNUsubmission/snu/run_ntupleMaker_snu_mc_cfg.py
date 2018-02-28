@@ -14,8 +14,8 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 10000
 process.source = cms.Source("PoolSource",
 fileNames = cms.untracked.vstring(
         #"root://cms-xrdr.sdfarm.kr:1094///xrd/store/group/CAT/ZZTo4L_13TeV_powheg_pythia8/v8-0-4_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/170116_110722/0000/catTuple_1.root"
-        "root://cms-xrdr.sdfarm.kr:1094///xrd/store/group/CAT/ttZJets_13TeV_madgraphMLM/v8-0-6_RunIISummer16MiniAODv2-80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/170303_113050/0000/catTuple_1.root"
-
+        "root://cms-xrdr.sdfarm.kr:1094///xrd/store/group/CAT/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/v8-0-6_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/171207_064925/0000/catTuple_1.root"
+        #"root://cms-xrdr.sdfarm.kr:1094///xrd/store/group/CAT/v8-0-8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/171126_161655/0000/catTuple_1.root"
       )
 )
 
@@ -23,8 +23,8 @@ process.nEventsTotal = cms.EDProducer("EventCountProducer")
 
 process.load("CATTools.CatProducer.pileupWeight_cff")
 process.redoPileupWeight = process.pileupWeight.clone()
-from CATTools.CatProducer.pileupWeight_cff import pileupWeightMap
 
+from CATTools.CatProducer.pileupWeight_cff import pileupWeightMap
 
 process.redoPileupWeight.weightingMethod = "RedoWeight"
 process.redoPileupWeight.pileupMC = pileupWeightMap["2016_25ns_Moriond17MC"]

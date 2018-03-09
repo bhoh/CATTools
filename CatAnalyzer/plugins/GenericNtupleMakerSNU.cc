@@ -275,17 +275,23 @@ private:
 
   edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> triggerObjects_;
 
-  edm::EDGetTokenT<edm::TriggerResults> metFilterBitsPAT_;
-  edm::EDGetTokenT<edm::TriggerResults> metFilterBitsRECO_;
+
+  //edm::EDGetTokenT<edm::TriggerResults> metFilterBitsPAT_;  //BHO
+  //edm::EDGetTokenT<edm::TriggerResults> metFilterBitsRECO_; //BHO
+  std::vector<edm::EDGetTokenT<edm::TriggerResults>> trigResTokens_; //BHO
+  std::vector<edm::EDGetTokenT<edm::TriggerResults>> flagTokens_; //BHO
+  std::vector<std::string> flagNames_; //BHO
+
 
   edm::EDGetTokenT<cat::TriggerNames> trigNamesToken_;
-  edm::EDGetTokenT<cat::TriggerBits> trigBitsToken_;
-  
+  edm::EDGetTokenT<cat::TriggerBits> trigBitsToken_;  
   edm::EDGetTokenT<reco::VertexCollection >   vtxToken_;
-  
+
+     
   /// Testing MET
-  std::vector< std::pair < std::string, std::string> >metFilterNames_;
-  
+  //std::vector< std::pair < std::string, std::string> >metFilterNames_; //BHO
+  cat::TriggerResValues filterBits_; //BHO
+
   /// CAT objects
   std::vector<CandToken> candTokens_;
   std::vector<std::vector<VmapToken> > vmapTokens_;
@@ -506,8 +512,21 @@ GenericNtupleMakerSNU::GenericNtupleMakerSNU(const edm::ParameterSet& pset)
   elecToken_ = consumes<edm::View<cat::Electron> >(pset.getParameter<edm::InputTag>("electrons"));
   jetToken_ = consumes<edm::View<cat::Jet> >(pset.getParameter<edm::InputTag>("jets"));
   fatjetToken_ = consumes<edm::View<cat::FatJet> >(pset.getParameter<edm::InputTag>("fatjets"));
-  metFilterBitsPAT_ = consumes<edm::TriggerResults>(pset.getParameter<edm::InputTag>("metFilterBitsPAT"));
-  metFilterBitsRECO_ = consumes<edm::TriggerResults>(pset.getParameter<edm::InputTag>("metFilterBitsRECO"));
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  //metFilterBitsPAT_ = consumes<edm::TriggerResults>(pset.getParameter<edm::InputTag>("metFilterBitsPAT"));
+  //metFilterBitsRECO_ = consumes<edm::TriggerResults>(pset.getParameter<edm::InputTag>("metFilterBitsRECO"));
+  
+  auto flagPSet = pset.getParameter<edm::ParameterSet>("flags");
+  flagNames_ = flagPSet.getParameter<strings>("names");
+  for ( auto& x : flagPSet.getParameter<std::vector<edm::InputTag>>("triggerResults") ) {
+    flagTokens_.push_back(consumes<edm::TriggerResults>(x));
+  }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//BHO
+
   vtxToken_  = consumes<reco::VertexCollection >(pset.getParameter<edm::InputTag>("vertices"));
   /// new weights
   genWeightToken_       = consumes<cat::GenWeights>              (pset.getParameter<edm::InputTag>("genWeightLabel"));
@@ -829,12 +848,12 @@ GenericNtupleMakerSNU::GenericNtupleMakerSNU(const edm::ParameterSet& pset)
   vfloatCSet_.init(pset, "floats", consumesCollector(), tree_);
   vstringCSet_.init(pset, "strings", consumesCollector(), tree_);
 
-  
+/*  
   for ( auto& hltPath : pset.getParameter<strings>("metFilterNames") ){
     //    produces<bool >( hltPath );
     metFilterNames_.push_back(std::make_pair("Flag_"+hltPath, hltPath));
   }
-
+*/ //BHO
   
   PSet candPSets = pset.getParameter<PSet>("cands");
   const strings candNames = candPSets.getParameterNamesForType<PSet>();
@@ -1271,8 +1290,8 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
     electrons_dxy.push_back(el.dxy()); 
     electrons_sigdxy.push_back(el.ipsignificance());
     electrons_dz.push_back(el.dz());
-    //electrons_mva.push_back(el.mva());
-    //electrons_zzmva.push_back(el.zzmva());
+    electrons_mva.push_back(el.mva());
+    electrons_zzmva.push_back(el.zzmva());
     electrons_smearedScale.push_back(el.smearedScale());
     electrons_isGsfCtfScPixChargeConsistent.push_back(el.isGsfCtfScPixChargeConsistent());
     
@@ -1373,10 +1392,10 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
     jets_smearedResUp.push_back(jt.smearedResUp()); 
     jets_PileupJetId.push_back(jt.pileupJetId()); 
 
-    //jets_L2L3resJEC.push_back(jt.L2L3resJEC());
-    //jets_L3absJEC.push_back(jt.L3absJEC());
-    //jets_L2relJEC.push_back(jt.L2relJEC());
-    //jets_L1fastjetJEC.push_back(jt.L1fastjetJEC());
+    jets_L2L3resJEC.push_back(jt.L2L3resJEC());
+    jets_L3absJEC.push_back(jt.L3absJEC());
+    jets_L2relJEC.push_back(jt.L2relJEC());
+    jets_L1fastjetJEC.push_back(jt.L1fastjetJEC());
     jets_Rho.push_back(jt.Rho());
     jets_JetArea.push_back(jt.JetArea()); //BHO
     jets_rawpt.push_back(jt.RawPt());
@@ -1432,10 +1451,10 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
     fatjets_puppi_tau1.push_back(jt.puppi_tau1());
     fatjets_puppi_tau2.push_back(jt.puppi_tau2());
     fatjets_puppi_tau3.push_back(jt.puppi_tau3());
-    //fatjets_L2L3resJEC.push_back(jt.L2L3resJEC());
-    //fatjets_L3absJEC.push_back(jt.L3absJEC());
-    //fatjets_L2relJEC.push_back(jt.L2relJEC());
-    //fatjets_L1fastjetJEC.push_back(jt.L1fastjetJEC());
+    fatjets_L2L3resJEC.push_back(jt.L2L3resJEC());
+    fatjets_L3absJEC.push_back(jt.L3absJEC());
+    fatjets_L2relJEC.push_back(jt.L2relJEC());
+    fatjets_L1fastjetJEC.push_back(jt.L1fastjetJEC());
     fatjets_Rho.push_back(jt.Rho());
     fatjets_JetArea.push_back(jt.JetArea()); //BHO
 
@@ -1524,6 +1543,8 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
   Flag_globalTightHalo2016Filter=false;
   Flag_EcalDeadCellTriggerPrimitiveFilter=false;
 
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
   edm::Handle<edm::TriggerResults> metFilterBits;
   if (!event.getByToken(metFilterBitsPAT_, metFilterBits)){
@@ -1550,6 +1571,32 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
   }
 
 */ //comment out by BHO
+
+  for ( auto token : flagTokens_ ) {
+     edm::Handle<edm::TriggerResults> flagHandle;
+     if ( !event.getByToken(token, flagHandle) ) continue;
+     auto filterNames = event.triggerNames(*flagHandle);
+     for ( auto flagName : flagNames_ ) {
+       unsigned int trigIndex = filterNames.triggerIndex(flagName);
+       if ( trigIndex >= flagHandle->size() ) continue;
+       if ( filterBits_.find(flagName) != filterBits_.end() ) continue;
+
+         TString metname = TString(flagName);
+	 if(metname.Contains("Flag_HBHENoiseFilter")) Flag_HBHENoiseFilter=true;
+	 if(metname.Contains("Flag_HBHENoiseIsoFilter")) Flag_HBHENoiseIsoFilter=true;
+	 if(metname.Contains("Flag_CSCTightHaloFilter")) Flag_CSCTightHaloFilter = true;
+	 if(metname.Contains("Flag_goodVertices")) Flag_goodVertices = true;
+	 if(metname.Contains("Flag_eeBadScFilter")) Flag_eeBadScFilter = true;
+	 if(metname.Contains("Flag_EcalDeadCellTriggerPrimitiveFilter")) Flag_EcalDeadCellTriggerPrimitiveFilter = true;
+	 if(metname.Contains("Flag_globalTightHalo2016Filter"))Flag_globalTightHalo2016Filter = true;
+
+     } // end of for
+  } // end of for
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//BHO: MET filter is modified
+
+
 
   ///// Fill GENParticle Info
   if(!event.isRealData()){

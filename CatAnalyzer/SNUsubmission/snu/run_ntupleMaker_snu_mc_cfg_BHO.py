@@ -14,9 +14,9 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 10000
 process.source = cms.Source("PoolSource",
 fileNames = cms.untracked.vstring(
         #"root://cms-xrdr.sdfarm.kr:1094///xrd/store/group/CAT/ZZTo4L_13TeV_powheg_pythia8/v8-0-4_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/170116_110722/0000/catTuple_1.root"
-        "root://cms-xrdr.sdfarm.kr:1094///xrd/store/group/CAT/ttZJets_13TeV_madgraphMLM/v8-0-6_RunIISummer16MiniAODv2-80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/171207_080158/0000/catTuple_1.root"
+        #"root://cms-xrdr.sdfarm.kr:1094///xrd/store/group/CAT/ttZJets_13TeV_madgraphMLM/v8-0-6_RunIISummer16MiniAODv2-80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/171207_080158/0000/catTuple_1.root"
         #"root://cms-xrdr.sdfarm.kr:1094///xrd/store/mc/RunIISummer16MiniAODv2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/4E043DF2-A4BE-E611-84AF-0025905B85C0.root"
-        #"root://cms-xrdr.sdfarm.kr:1094///xrd/store/group/CAT/v8-0-8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/171126_161655/0000/catTuple_467.root"
+        "root://cms-xrdr.sdfarm.kr:1094///xrd/store/group/CAT/v8-0-8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/171126_161655/0000/catTuple_467.root"
       )
 )
 
@@ -53,6 +53,27 @@ process.load("CATTools.CatAnalyzer.flatGenWeights_cfi")
 
 pileupWeight = 'pileupWeight'
 
+#BHO
+'''
+from CondCore.DBCommon.CondDBSetup_cfi import *
+
+process.load("RecoBTag.Combined.deepFlavour_cff")
+
+process.catJets.flavTagLabels.extend([
+    cms.InputTag("pfDeepFlavourJetTags:probudsg"),
+    cms.InputTag("pfDeepFlavourJetTags:probb"),
+    cms.InputTag("pfDeepFlavourJetTags:probc"),
+    cms.InputTag("pfDeepFlavourJetTags:probbb"),
+    cms.InputTag("pfDeepFlavourJetTags:probcc"),
+    cms.InputTag("pfDeepFlavourCMVAJetTags:probudsg"),
+    cms.InputTag("pfDeepFlavourCMVAJetTags:probb"),
+    cms.InputTag("pfDeepFlavourCMVAJetTags:probc"),
+    cms.InputTag("pfDeepFlavourCMVAJetTags:probbb"),
+    cms.InputTag("pfDeepFlavourCMVAJetTags:probcc"),
+])
+'''
+
+
 process.ntuple = cms.EDAnalyzer("GenericNtupleMakerSNU",
     failureMode = cms.untracked.string("keep"), # choose one among keep/skip/error
     eventCounters = cms.vstring("nEventsTotal"), #"nEventsTotal", "nEventsClean", "nEventsPAT"),
@@ -87,7 +108,29 @@ process.ntuple = cms.EDAnalyzer("GenericNtupleMakerSNU",
         "eeBadScFilter",
         "globalTightHalo2016Filter",
         "goodVertices",
-), 
+),
+    flags = cms.PSet( #BHO
+        triggerResults = cms.VInputTag(
+            cms.InputTag("TriggerResults","","RECO"),
+            cms.InputTag("TriggerResults","","PAT"),
+        ),
+        names = cms.vstring(
+            "Flag_goodVertices",
+            "Flag_globalTightHalo2016Filter",
+            "Flag_HBHENoiseFilter",
+            "Flag_HBHENoiseIsoFilter",
+            "Flag_EcalDeadCellTriggerPrimitiveFilter",
+            "Flag_eeBadScFilter",
+            "Flag_badMuons", "Flag_duplicateMuons", "Flag_noBadMuons",
+        ),
+        bools = cms.VInputTag(
+            cms.InputTag("BadChargedCandidateFilter"),
+            cms.InputTag("BadPFMuonFilter"),
+            cms.InputTag("badECALSlewRateMitigationFilter2016"),
+        ),
+
+    ),
+ 
     int = cms.PSet(
         nGoodPV           =  cms.InputTag("catVertex"   , "nGoodPV"),
         nPV               =  cms.InputTag("catVertex"   , "nPV"    ),
@@ -201,7 +244,7 @@ cands_bool= cms.PSet(
             selections = cms.untracked.PSet(),
             ),
         
-        )#end of cands
+       )#end of cands
 )
 
 process.TFileService = cms.Service("TFileService",

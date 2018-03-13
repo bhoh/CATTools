@@ -111,6 +111,7 @@ namespace cat {
     float RawE() const {return rawe_;}
     float L2L3resJEC() const { return l2l3res_;}
     float L3absJEC() const { return l3fabs_;}
+    float L2relJEC() const { return l2rel_;}
     float L1fastjetJEC() const { return l1fast_;}
     float Rho() const { return rho_;}
     float JetArea() const { return area_ ;}

@@ -33,13 +33,14 @@
 #include "CATTools/DataFormats/interface/Electron.h"
 #include "CATTools/DataFormats/interface/GenJet.h"
 #include "CATTools/DataFormats/interface/GenWeights.h"
-
+#include "CATTools/DataFormats/interface/Trigger.h" //BHO
 
 #include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "DataFormats/PatCandidates/interface/PackedTriggerPrescales.h"
 #include "CATTools/DataFormats/interface/Trigger.h"
+#include "DataFormats/PatCandidates/interface/TriggerObjectStandAlone.h"
 
 
 #include "CATTools/CatAnalyzer/src/rochcor2016.h"
@@ -372,7 +373,7 @@ private:
   std::vector<double> electrons_pt, electrons_eta,electrons_phi, electrons_m, electrons_energy;
 
   //// jets  21
-  std::vector<double>   jets_vtxMass, jets_vtx3DVal, jets_vtx3DSig, jets_CSVInclV2, jets_JetProbBJet, jets_CMVAV2, jets_chargedEmEnergyFraction, jets_shiftedEnDown, jets_shiftedEnUp, jets_smearedRes, jets_smearedResDown, jets_smearedResUp, jets_PileupJetId, jets_iCSVCvsL,jets_CCvsLT, jets_CCvsBT, jets_DeepCSV, jets_DeepCMVA;
+  std::vector<double>   jets_vtxMass, jets_vtx3DVal, jets_vtx3DSig, jets_CSVInclV2, jets_JetProbBJet, jets_CMVAV2, jets_chargedEmEnergyFraction, jets_shiftedEnDown, jets_shiftedEnUp, jets_smearedRes, jets_smearedResDown, jets_smearedResUp, jets_PileupJetId, jets_iCSVCvsL,jets_CCvsLT, jets_CCvsBT, jets_DeepCSV_probb, jets_DeepCSV_probc;
   std::vector<double>   fatjets_vtxMass, fatjets_vtx3DVal, fatjets_vtx3DSig, fatjets_CSVInclV2, fatjets_JetProbBJet, fatjets_CMVAV2, fatjets_chargedEmEnergyFraction, fatjets_shiftedEnDown, fatjets_shiftedEnUp, fatjets_smearedRes, fatjets_smearedResDown, fatjets_smearedResUp, fatjets_PileupJetId, fatjets_iCSVCvsL,fatjets_CCvsLT, fatjets_CCvsBT , fatjets_tau1, fatjets_tau2,fatjets_tau3, fatjets_prunedmass, fatjets_softdropmass;
   
   std::vector<double> jets_pt, jets_eta,jets_phi, jets_m, jets_energy;
@@ -753,8 +754,9 @@ GenericNtupleMakerSNU::GenericNtupleMakerSNU(const edm::ParameterSet& pset)
   tree_->Branch("jets_CSVInclV2",  "std::vector<double>", &jets_CSVInclV2);
   tree_->Branch("jets_iCSVCvsL",  "std::vector<double>", &jets_iCSVCvsL);
   tree_->Branch("jets_CCvsLT",  "std::vector<double>", &jets_CCvsLT);
-  tree_->Branch("jets_DeepCSV",  "std::vector<double>", &jets_DeepCSV);
-  tree_->Branch("jets_DeepCMVA",  "std::vector<double>", &jets_DeepCMVA);
+  tree_->Branch("jets_DeepCSV_probb",  "std::vector<double>", &jets_DeepCSV_probb);
+  tree_->Branch("jets_DeepCSV_probc",  "std::vector<double>", &jets_DeepCSV_probc);
+
   tree_->Branch("jets_CCvsBT",  "std::vector<double>", &jets_CCvsBT);
   tree_->Branch("jets_JetProbBJet",  "std::vector<double>", &jets_JetProbBJet);
   tree_->Branch("jets_CMVAV2",  "std::vector<double>", &jets_CMVAV2);
@@ -1378,8 +1380,8 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
     jets_vtx3DSig.push_back(jt.vtx3DSig()); 
     jets_CSVInclV2.push_back(jt.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
     jets_iCSVCvsL.push_back(jt.bDiscriminator("inclusiveCandidateSecondaryVerticesCvsL"));
-    jets_DeepCSV.push_back(jt.bDiscriminator("DeepCSV"));
-    jets_DeepCMVA.push_back(jt.bDiscriminator("DeepCMVA"));
+    jets_DeepCSV_probb.push_back(jt.bDiscriminator("pfDeepFlavourJetTags:probb"));
+    jets_DeepCSV_probc.push_back(jt.bDiscriminator("pfDeepFlavourJetTags:probc"));
     jets_CCvsLT.push_back(jt.bDiscriminator("pfCombinedCvsLJetTags"));
     jets_CCvsBT.push_back(jt.bDiscriminator("pfCombinedCvsBJetTags"));
     jets_JetProbBJet.push_back(jt.bDiscriminator("pfJetProbabilityBJetTags")); 
@@ -1938,8 +1940,8 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
   jets_CSVInclV2.clear();
   jets_iCSVCvsL.clear();
   jets_CCvsLT.clear();
-  jets_DeepCSV.clear();
-  jets_DeepCMVA.clear();
+  jets_DeepCSV_probb.clear();
+  jets_DeepCSV_probc.clear();
   jets_CCvsBT.clear();
   jets_JetProbBJet.clear();
   jets_CMVAV2.clear();

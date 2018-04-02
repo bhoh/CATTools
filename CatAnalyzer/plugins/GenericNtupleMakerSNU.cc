@@ -277,21 +277,15 @@ private:
   edm::EDGetTokenT<pat::TriggerObjectStandAloneCollection> triggerObjects_;
 
 
-  //edm::EDGetTokenT<edm::TriggerResults> metFilterBitsPAT_;  //BHO
-  //edm::EDGetTokenT<edm::TriggerResults> metFilterBitsRECO_; //BHO
-  std::vector<edm::EDGetTokenT<edm::TriggerResults>> trigResTokens_; //BHO
-  std::vector<edm::EDGetTokenT<edm::TriggerResults>> flagTokens_; //BHO
-  std::vector<std::string> flagNames_; //BHO
+  edm::EDGetTokenT<edm::TriggerResults> metFilterBitsPAT_;
+  edm::EDGetTokenT<edm::TriggerResults> metFilterBitsRECO_; 
 
-
-  edm::EDGetTokenT<cat::TriggerNames> trigNamesToken_;
-  edm::EDGetTokenT<cat::TriggerBits> trigBitsToken_;  
+  edm::EDGetTokenT<cat::TriggerNames> filterNames_;
+  edm::EDGetTokenT<cat::TriggerBits> filterBits_;  
   edm::EDGetTokenT<reco::VertexCollection >   vtxToken_;
 
      
   /// Testing MET
-  //std::vector< std::pair < std::string, std::string> >metFilterNames_; //BHO
-  cat::TriggerResValues filterBits_; //BHO
 
   /// CAT objects
   std::vector<CandToken> candTokens_;
@@ -373,7 +367,7 @@ private:
   std::vector<double> electrons_pt, electrons_eta,electrons_phi, electrons_m, electrons_energy;
 
   //// jets  21
-  std::vector<double>   jets_vtxMass, jets_vtx3DVal, jets_vtx3DSig, jets_CSVInclV2, jets_JetProbBJet, jets_CMVAV2, jets_chargedEmEnergyFraction, jets_shiftedEnDown, jets_shiftedEnUp, jets_smearedRes, jets_smearedResDown, jets_smearedResUp, jets_PileupJetId, jets_iCSVCvsL,jets_CCvsLT, jets_CCvsBT, jets_DeepCSV_probb, jets_DeepCSV_probc;
+  std::vector<double>   jets_vtxMass, jets_vtx3DVal, jets_vtx3DSig, jets_CSVInclV2, jets_JetProbBJet, jets_CMVAV2, jets_chargedEmEnergyFraction, jets_shiftedEnDown, jets_shiftedEnUp, jets_smearedRes, jets_smearedResDown, jets_smearedResUp, jets_PileupJetId, jets_iCSVCvsL,jets_CCvsLT, jets_CCvsBT, jets_DeepCSV_probb, jets_DeepCSV_probbb, jets_DeepCSV_probc, jets_DeepCSV_probcc;
   std::vector<double>   fatjets_vtxMass, fatjets_vtx3DVal, fatjets_vtx3DSig, fatjets_CSVInclV2, fatjets_JetProbBJet, fatjets_CMVAV2, fatjets_chargedEmEnergyFraction, fatjets_shiftedEnDown, fatjets_shiftedEnUp, fatjets_smearedRes, fatjets_smearedResDown, fatjets_smearedResUp, fatjets_PileupJetId, fatjets_iCSVCvsL,fatjets_CCvsLT, fatjets_CCvsBT , fatjets_tau1, fatjets_tau2,fatjets_tau3, fatjets_prunedmass, fatjets_softdropmass;
   
   std::vector<double> jets_pt, jets_eta,jets_phi, jets_m, jets_energy;
@@ -439,7 +433,6 @@ private:
   edm::EDGetTokenT<edm::View<cat::Electron> > elecToken_;
   edm::EDGetTokenT<cat::GenWeights>              genWeightToken_;
   edm::EDGetTokenT<vfloat> pdfweightsToken_, scaleupweightsToken_, scaledownweightsToken_;
-
 
   /// bool
   std::vector<std::vector<vbool*> > cand_boolVars_;
@@ -508,25 +501,17 @@ GenericNtupleMakerSNU::GenericNtupleMakerSNU(const edm::ParameterSet& pset)
 
   triggerObjects_ = consumes<pat::TriggerObjectStandAloneCollection>(pset.getParameter<edm::InputTag>("triggerObjects"));
 
+  filterBits_ = consumes<cat::TriggerBits>(pset.getParameter<edm::InputTag>("triggerObjects"));
+  filterNames_ = consumes<cat::TriggerNames, edm::InLumi>(pset.getParameter<edm::InputTag>("triggerObjects"));
+
   metToken_  = consumes<cat::METCollection>(pset.getParameter<edm::InputTag>("met"));
   muonToken_ = consumes<edm::View<cat::Muon> >(pset.getParameter<edm::InputTag>("muons"));
   elecToken_ = consumes<edm::View<cat::Electron> >(pset.getParameter<edm::InputTag>("electrons"));
   jetToken_ = consumes<edm::View<cat::Jet> >(pset.getParameter<edm::InputTag>("jets"));
   fatjetToken_ = consumes<edm::View<cat::FatJet> >(pset.getParameter<edm::InputTag>("fatjets"));
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  //metFilterBitsPAT_ = consumes<edm::TriggerResults>(pset.getParameter<edm::InputTag>("metFilterBitsPAT"));
-  //metFilterBitsRECO_ = consumes<edm::TriggerResults>(pset.getParameter<edm::InputTag>("metFilterBitsRECO"));
-  
-  auto flagPSet = pset.getParameter<edm::ParameterSet>("flags");
-  flagNames_ = flagPSet.getParameter<strings>("names");
-  for ( auto& x : flagPSet.getParameter<std::vector<edm::InputTag>>("triggerResults") ) {
-    flagTokens_.push_back(consumes<edm::TriggerResults>(x));
-  }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//BHO
+  //const auto filterSet = pset.getParameter<edm::ParameterSet>("filters"); //BHO
+  //recoFilterToken_ = consumes<int>(pset.getParameter<edm::InputTag>("filterRECO")); //BHO
 
   vtxToken_  = consumes<reco::VertexCollection >(pset.getParameter<edm::InputTag>("vertices"));
   /// new weights
@@ -545,8 +530,8 @@ GenericNtupleMakerSNU::GenericNtupleMakerSNU(const edm::ParameterSet& pset)
   store_allweights = pset.getParameter<bool>("allweights");
   if(runFullTrig) cout << "Running fulltrigger" << endl;
   else cout << "Not running full trigger" << endl;
-  //// Test MET
 
+  //// Test MET
 
   // Output histograms and tree
   edm::Service<TFileService> fs;
@@ -755,7 +740,9 @@ GenericNtupleMakerSNU::GenericNtupleMakerSNU(const edm::ParameterSet& pset)
   tree_->Branch("jets_iCSVCvsL",  "std::vector<double>", &jets_iCSVCvsL);
   tree_->Branch("jets_CCvsLT",  "std::vector<double>", &jets_CCvsLT);
   tree_->Branch("jets_DeepCSV_probb",  "std::vector<double>", &jets_DeepCSV_probb);
+  tree_->Branch("jets_DeepCSV_probbb",  "std::vector<double>", &jets_DeepCSV_probbb);
   tree_->Branch("jets_DeepCSV_probc",  "std::vector<double>", &jets_DeepCSV_probc);
+  tree_->Branch("jets_DeepCSV_probcc",  "std::vector<double>", &jets_DeepCSV_probcc);
 
   tree_->Branch("jets_CCvsBT",  "std::vector<double>", &jets_CCvsBT);
   tree_->Branch("jets_JetProbBJet",  "std::vector<double>", &jets_JetProbBJet);
@@ -850,12 +837,6 @@ GenericNtupleMakerSNU::GenericNtupleMakerSNU(const edm::ParameterSet& pset)
   vfloatCSet_.init(pset, "floats", consumesCollector(), tree_);
   vstringCSet_.init(pset, "strings", consumesCollector(), tree_);
 
-/*  
-  for ( auto& hltPath : pset.getParameter<strings>("metFilterNames") ){
-    //    produces<bool >( hltPath );
-    metFilterNames_.push_back(std::make_pair("Flag_"+hltPath, hltPath));
-  }
-*/ //BHO
   
   PSet candPSets = pset.getParameter<PSet>("cands");
   const strings candNames = candPSets.getParameterNamesForType<PSet>();
@@ -1090,8 +1071,9 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
   event.getByToken(triggerObjects_, triggerObjects);
 
   const edm::TriggerNames &trigNames = event.triggerNames(*triggerBits);  
-
   AnalysisHelper trigHelper = AnalysisHelper(trigNames, triggerBits, triggerObjects);
+
+
 
   // save filter info                                                                                                                                                            //  const auto trigNames = trigNamesHandle->names();
   //  for ( int index=0, nTrig=trigNames.size(); index<nTrig; ++index ) {
@@ -1357,6 +1339,10 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
   }
   
   for (auto jt : *jets) {
+
+    //BHO: Debug
+    jt.bDiscriminatorPrint();
+
     if(jt.pt() < j_pt_min) continue;
     if(fabs(jt.eta()) > j_eta_max) continue;
     
@@ -1380,8 +1366,10 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
     jets_vtx3DSig.push_back(jt.vtx3DSig()); 
     jets_CSVInclV2.push_back(jt.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
     jets_iCSVCvsL.push_back(jt.bDiscriminator("inclusiveCandidateSecondaryVerticesCvsL"));
-    jets_DeepCSV_probb.push_back(jt.bDiscriminator("pfDeepFlavourJetTags:probb"));
-    jets_DeepCSV_probc.push_back(jt.bDiscriminator("pfDeepFlavourJetTags:probc"));
+    jets_DeepCSV_probb.push_back(jt.bDiscriminator("deepFlavourJetTags:probb"));
+    jets_DeepCSV_probbb.push_back(jt.bDiscriminator("deepFlavourJetTags:probbb"));   
+    jets_DeepCSV_probc.push_back(jt.bDiscriminator("deepFlavourJetTags:probc"));
+    jets_DeepCSV_probcc.push_back(jt.bDiscriminator("deepFlavourJetTags:probcc"));
     jets_CCvsLT.push_back(jt.bDiscriminator("pfCombinedCvsLJetTags"));
     jets_CCvsBT.push_back(jt.bDiscriminator("pfCombinedCvsBJetTags"));
     jets_JetProbBJet.push_back(jt.bDiscriminator("pfJetProbabilityBJetTags")); 
@@ -1539,7 +1527,7 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
   // save filter info
   Flag_HBHENoiseFilter=false;
   Flag_HBHENoiseIsoFilter=false;
-  Flag_CSCTightHaloFilter=false;
+  Flag_CSCTightHaloFilter=false; // does not exist
   Flag_goodVertices=false;
   Flag_eeBadScFilter=false;
   Flag_globalTightHalo2016Filter=false;
@@ -1547,6 +1535,7 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /*
   edm::Handle<edm::TriggerResults> metFilterBits;
   if (!event.getByToken(metFilterBitsPAT_, metFilterBits)){
@@ -1574,30 +1563,38 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
 
 */ //comment out by BHO
 
-  for ( auto token : flagTokens_ ) {
-     edm::Handle<edm::TriggerResults> flagHandle;
-     if ( !event.getByToken(token, flagHandle) ) continue;
-     auto filterNames = event.triggerNames(*flagHandle);
-     for ( auto flagName : flagNames_ ) {
-       unsigned int trigIndex = filterNames.triggerIndex(flagName);
-       if ( trigIndex >= flagHandle->size() ) continue;
-       if ( filterBits_.find(flagName) != filterBits_.end() ) continue;
 
-         TString metname = TString(flagName);
-	 if(metname.Contains("Flag_HBHENoiseFilter")) Flag_HBHENoiseFilter=true;
-	 if(metname.Contains("Flag_HBHENoiseIsoFilter")) Flag_HBHENoiseIsoFilter=true;
-	 if(metname.Contains("Flag_CSCTightHaloFilter")) Flag_CSCTightHaloFilter = true;
-	 if(metname.Contains("Flag_goodVertices")) Flag_goodVertices = true;
-	 if(metname.Contains("Flag_eeBadScFilter")) Flag_eeBadScFilter = true;
-	 if(metname.Contains("Flag_EcalDeadCellTriggerPrimitiveFilter")) Flag_EcalDeadCellTriggerPrimitiveFilter = true;
-	 if(metname.Contains("Flag_globalTightHalo2016Filter"))Flag_globalTightHalo2016Filter = true;
+  edm::Handle<cat::TriggerNames> filterNames;
+  event.getLuminosityBlock().getByToken(filterNames_, filterNames);
 
-     } // end of for
-  } // end of for
+  edm::Handle<cat::TriggerBits> filterBits;
+  event.getByToken(filterBits_, filterBits);
+
+  if(filterNames->names().size() != filterBits->values().size()){
+    cout << "Inconsistent number of trigBits!!!!" << endl;
+  }
+
+  for(int i =0; (unsigned)i < filterNames->names().size(); i++){
+
+    TString tmp_name = TString(filterNames->names().at(i));
+    int tmp_value = filterBits->values().at(i);
+
+    if(tmp_name.Contains("Flag_HBHENoiseFilter")) Flag_HBHENoiseFilter=(bool)tmp_value;
+    if(tmp_name.Contains("Flag_HBHENoiseIsoFilter")) Flag_HBHENoiseIsoFilter=(bool)tmp_value;
+    if(tmp_name.Contains("Flag_CSCTightHaloFilter")) Flag_CSCTightHaloFilter =(bool)tmp_value; // dose not exist
+    if(tmp_name.Contains("Flag_goodVertices")) Flag_goodVertices =(bool)tmp_value;
+    if(tmp_name.Contains("Flag_eeBadScFilter")) Flag_eeBadScFilter =(bool)tmp_value;
+    if(tmp_name.Contains("Flag_EcalDeadCellTriggerPrimitiveFilter")) Flag_EcalDeadCellTriggerPrimitiveFilter =(bool)tmp_value;
+    if(tmp_name.Contains("Flag_globalTightHalo2016Filter"))Flag_globalTightHalo2016Filter =(bool)tmp_value;
+ 
+    //Debug
+    //cout << filterNames->names().at(i) << ": " << filterBits->values().at(i) << endl;
+
+  }
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //BHO: MET filter is modified
-
 
 
   ///// Fill GENParticle Info
@@ -1941,7 +1938,9 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
   jets_iCSVCvsL.clear();
   jets_CCvsLT.clear();
   jets_DeepCSV_probb.clear();
+  jets_DeepCSV_probbb.clear();
   jets_DeepCSV_probc.clear();
+  jets_DeepCSV_probcc.clear();
   jets_CCvsBT.clear();
   jets_JetProbBJet.clear();
   jets_CMVAV2.clear();

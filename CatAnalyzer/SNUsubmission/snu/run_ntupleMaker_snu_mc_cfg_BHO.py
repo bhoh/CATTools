@@ -50,6 +50,7 @@ process.redoPileupWeight.doPeriodWeights  = cms.bool(True)
 redopileupWeight = 'redoPileupWeight'
 
 process.load("CATTools.CatAnalyzer.flatGenWeights_cfi")
+process.load("CATTools.CatAnalyzer.filters_cff") #BHO
 
 pileupWeight = 'pileupWeight'
 
@@ -72,6 +73,7 @@ process.catJets.flavTagLabels.extend([
     cms.InputTag("pfDeepFlavourCMVAJetTags:probcc"),
 ])
 '''
+
 
 
 process.ntuple = cms.EDAnalyzer("GenericNtupleMakerSNU",
@@ -98,38 +100,6 @@ process.ntuple = cms.EDAnalyzer("GenericNtupleMakerSNU",
     keepAllGen= cms.bool(True),
     makeSlim= cms.bool(True),
     allweights= cms.bool(False),
-    metFilterBitsPAT = cms.InputTag("TriggerResults","","PAT"),                                                                                                     
-    metFilterBitsRECO = cms.InputTag("TriggerResults","","RECO"), #BHO               
-    metFilterNames = cms.vstring(                                               
-        "HBHENoiseFilter",
-        "HBHENoiseIsoFilter",
-        "EcalDeadCellTriggerPrimitiveFilter",
-        "CSCTightHaloFilter",
-        "eeBadScFilter",
-        "globalTightHalo2016Filter",
-        "goodVertices",
-),
-    flags = cms.PSet( #BHO
-        triggerResults = cms.VInputTag(
-            cms.InputTag("TriggerResults","","RECO"),
-            cms.InputTag("TriggerResults","","PAT"),
-        ),
-        names = cms.vstring(
-            "Flag_goodVertices",
-            "Flag_globalTightHalo2016Filter",
-            "Flag_HBHENoiseFilter",
-            "Flag_HBHENoiseIsoFilter",
-            "Flag_EcalDeadCellTriggerPrimitiveFilter",
-            "Flag_eeBadScFilter",
-            "Flag_badMuons", "Flag_duplicateMuons", "Flag_noBadMuons",
-        ),
-        bools = cms.VInputTag(
-            cms.InputTag("BadChargedCandidateFilter"),
-            cms.InputTag("BadPFMuonFilter"),
-            cms.InputTag("badECALSlewRateMitigationFilter2016"),
-        ),
-
-    ),
  
     int = cms.PSet(
         nGoodPV           =  cms.InputTag("catVertex"   , "nGoodPV"),
@@ -137,10 +107,10 @@ process.ntuple = cms.EDAnalyzer("GenericNtupleMakerSNU",
         nTrueInteraction  =  cms.InputTag(pileupWeight, "nTrueInteraction" ),
         
     ),
- bool  = cms.PSet(
+    bool  = cms.PSet(
          BadChargedCandidateFilter =  cms.InputTag("BadChargedCandidateFilter"),
          BadPFMuonFilter =  cms.InputTag("BadPFMuonFilter"),
- ),
+    ),
 
     float = cms.PSet(
         puWeightGold   = cms.InputTag(redopileupWeight),
@@ -160,23 +130,23 @@ process.ntuple = cms.EDAnalyzer("GenericNtupleMakerSNU",
     floats = cms.PSet(
     ),
 
-cands_int= cms.PSet(
-),
+    cands_int= cms.PSet(
+    ),
 
-cands_bool= cms.PSet(
+    cands_bool= cms.PSet(
 
-      photons = cms.PSet(
-            src = cms.InputTag("catPhotons"),
-            exprs = cms.untracked.PSet(
-                #photonID_loose   = cms.string("photonID('cutBasedPhotonID-Spring15-25ns-V1-standalone-loose')"),
-                #photonID_medium   = cms.string("photonID('cutBasedPhotonID-Spring15-25ns-V1-standalone-medium')"),
-                #photonID_tight   = cms.string("photonID('cutBasedPhotonID-Spring15-25ns-V1-standalone-tight')"),
-                #photonID_mva        = cms.string("photonID('mvaPhoID-Spring15-25ns-nonTrig-V2-wp90')"),
-                mcMatched = cms.string("mcMatched"),
-                haspixseed = cms.string("HasPixelSeed"),
-                passelectronveto = cms.string("PassElectronVeto"),
+    photons = cms.PSet(
+        src = cms.InputTag("catPhotons"),
+        exprs = cms.untracked.PSet(
+        #photonID_loose   = cms.string("photonID('cutBasedPhotonID-Spring15-25ns-V1-standalone-loose')"),
+        #photonID_medium   = cms.string("photonID('cutBasedPhotonID-Spring15-25ns-V1-standalone-medium')"),
+        #photonID_tight   = cms.string("photonID('cutBasedPhotonID-Spring15-25ns-V1-standalone-tight')"),
+        #photonID_mva        = cms.string("photonID('mvaPhoID-Spring15-25ns-nonTrig-V2-wp90')"),
+        mcMatched = cms.string("mcMatched"),
+        haspixseed = cms.string("HasPixelSeed"),
+        passelectronveto = cms.string("PassElectronVeto"),
                 ),
-            selections = cms.untracked.PSet(),
+        selections = cms.untracked.PSet(),
             ),
         ),#end of cand jets
 

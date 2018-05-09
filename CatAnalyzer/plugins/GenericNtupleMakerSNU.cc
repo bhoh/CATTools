@@ -1366,10 +1366,10 @@ void GenericNtupleMakerSNU::analyze(const edm::Event& event, const edm::EventSet
     jets_vtx3DSig.push_back(jt.vtx3DSig()); 
     jets_CSVInclV2.push_back(jt.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
     jets_iCSVCvsL.push_back(jt.bDiscriminator("inclusiveCandidateSecondaryVerticesCvsL"));
-    jets_DeepCSV_probb.push_back(jt.bDiscriminator("deepFlavourJetTags:probb"));
-    jets_DeepCSV_probbb.push_back(jt.bDiscriminator("deepFlavourJetTags:probbb"));   
-    jets_DeepCSV_probc.push_back(jt.bDiscriminator("deepFlavourJetTags:probc"));
-    jets_DeepCSV_probcc.push_back(jt.bDiscriminator("deepFlavourJetTags:probcc"));
+    jets_DeepCSV_probb.push_back(jt.bDiscriminator("pfDeepCSVJetTags:probb"));
+    jets_DeepCSV_probbb.push_back(jt.bDiscriminator("pfDeepCSVJetTags:probbb"));   
+    jets_DeepCSV_probc.push_back(jt.bDiscriminator("pfDeepCSVJetTags:probc"));
+    jets_DeepCSV_probcc.push_back(jt.bDiscriminator("pfDeepCSVJetTags:probcc"));
     jets_CCvsLT.push_back(jt.bDiscriminator("pfCombinedCvsLJetTags"));
     jets_CCvsBT.push_back(jt.bDiscriminator("pfCombinedCvsBJetTags"));
     jets_JetProbBJet.push_back(jt.bDiscriminator("pfJetProbabilityBJetTags")); 

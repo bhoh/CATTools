@@ -106,7 +106,7 @@ def catTool(process, runOnMC=True, useMiniAOD=True):
 
         ## DeepFlavour
         from CATTools.CatProducer.patTools.jetDeepFlavour_cff import enableDeepFlavour
-        process = enableDeepFlavour(process)
+        process = enableDeepFlavour(process) 
 
         ## #######################################################################
         ## # MET corrections from https://twiki.cern.ch/twiki/bin/view/CMS/MissingETUncertaintyPrescription

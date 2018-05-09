@@ -203,6 +203,7 @@ void cat::CATJetProducer::produce(edm::Event & iEvent, const edm::EventSetup & i
     else {
       for ( auto btagName : btagNames_ ) {
         aJet.addBDiscriminatorPair(std::make_pair(btagName, aPatJet.bDiscriminator(btagName) ));
+      //cout << "TaggerName: " << btagName << "\t\tvalue: " << aPatJet.bDiscriminator(btagName) << endl;;
       }
     }
     for ( int i=0, n=flavTagNames_.size(); i<n; ++i ) {

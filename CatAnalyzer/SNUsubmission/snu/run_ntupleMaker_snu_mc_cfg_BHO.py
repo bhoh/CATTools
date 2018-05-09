@@ -16,7 +16,8 @@ fileNames = cms.untracked.vstring(
         #"root://cms-xrdr.sdfarm.kr:1094///xrd/store/group/CAT/ZZTo4L_13TeV_powheg_pythia8/v8-0-4_RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/170116_110722/0000/catTuple_1.root"
         #"root://cms-xrdr.sdfarm.kr:1094///xrd/store/group/CAT/ttZJets_13TeV_madgraphMLM/v8-0-6_RunIISummer16MiniAODv2-80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/171207_080158/0000/catTuple_1.root"
         #"root://cms-xrdr.sdfarm.kr:1094///xrd/store/mc/RunIISummer16MiniAODv2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/4E043DF2-A4BE-E611-84AF-0025905B85C0.root"
-        "root://cms-xrdr.sdfarm.kr:1094///xrd/store/group/CAT/v8-0-8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/171126_161655/0000/catTuple_467.root"
+        #"root://cms-xrdr.sdfarm.kr:1094///xrd/store/group/CAT/v8-0-8/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/171126_161655/0000/catTuple_467.root"
+        "file:/cms/ldap_home/bhoh/v8-0-8.3/cattools/src/CATTools/CatProducer/prod/catTuple.root"
       )
 )
 
